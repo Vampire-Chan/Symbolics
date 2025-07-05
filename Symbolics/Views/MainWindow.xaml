@@ -1,0 +1,330 @@
+<Window x:Class="Symbolics.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Symbolics.ViewModels"
+        xmlns:models="clr-namespace:Symbolics.Models"
+        xmlns:utils="clr-namespace:Symbolics.Utils"
+        Title="🔗 Symbolics - Symbolic Link Manager" 
+        Height="700" Width="1000"
+        MinHeight="500" MinWidth="750"
+        Background="{DynamicResource BackgroundBrush}"
+        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        ResizeMode="CanResize">
+    
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <!-- Theme Resources -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Themes/DarkTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Converters -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <utils:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+            <utils:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+            
+            <!-- Status to Color Converter -->
+            <Style x:Key="StatusIndicator" TargetType="Ellipse">
+                <Setter Property="Width" Value="8"/>
+                <Setter Property="Height" Value="8"/>
+                <Setter Property="Fill" Value="{DynamicResource TextSecondaryBrush}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Status}" Value="{x:Static models:OperationStatus.Completed}">
+                        <Setter Property="Fill" Value="{DynamicResource SuccessBrush}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Status}" Value="{x:Static models:OperationStatus.Failed}">
+                        <Setter Property="Fill" Value="{DynamicResource ErrorBrush}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Status}" Value="{x:Static models:OperationStatus.InProgress}">
+                        <Setter Property="Fill" Value="{DynamicResource WarningBrush}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Status}" Value="{x:Static models:OperationStatus.RolledBack}">
+                        <Setter Property="Fill" Value="{DynamicResource TextSecondaryBrush}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header with Theme Switches -->
+        <Grid Grid.Row="0" Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Column="0" Orientation="Vertical">
+                <TextBlock Text="🔗 Symbolics" 
+                          FontSize="32" 
+                          FontWeight="Bold" 
+                          Foreground="{DynamicResource TextBrush}"/>
+                <TextBlock Text="Advanced Symbolic Link Manager" 
+                          FontSize="14" 
+                          Foreground="{DynamicResource TextSecondaryBrush}"
+                          Margin="0,4,0,0"/>
+            </StackPanel>
+            
+            <!-- Theme Toggle Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                <Button Style="{StaticResource IconButton}" 
+                        Command="{Binding SwitchThemeCommand}" 
+                        CommandParameter="{x:Static models:ThemeType.Dark}"
+                        ToolTip="Dark Theme (F1)"
+                        Margin="0,0,4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🌙" FontSize="14" Margin="0,0,4,0"/>
+                        <TextBlock Text="Dark" FontSize="12" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource IconButton}" 
+                        Command="{Binding SwitchThemeCommand}" 
+                        CommandParameter="{x:Static models:ThemeType.Light}"
+                        ToolTip="Light Theme (F2)"
+                        Margin="0,0,4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="☀️" FontSize="14" Margin="0,0,4,0"/>
+                        <TextBlock Text="Light" FontSize="12" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource IconButton}" 
+                        Command="{Binding SwitchThemeCommand}" 
+                        CommandParameter="{x:Static models:ThemeType.Blue}"
+                        ToolTip="Blue Theme (F3)"
+                        Margin="0,0,4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🔵" FontSize="14" Margin="0,0,4,0"/>
+                        <TextBlock Text="Blue" FontSize="12" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource IconButton}" 
+                        Command="{Binding ChooseCustomThemeCommand}"
+                        ToolTip="Choose Custom Theme (F4)">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🎨" FontSize="14" Margin="0,0,4,0"/>
+                        <TextBlock Text="Custom" FontSize="12" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Main Content -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,24">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Admin Warning -->
+                <Border Grid.Row="0" 
+                        Background="{DynamicResource WarningBrush}" 
+                        CornerRadius="4" 
+                        Padding="12,8" 
+                        Margin="0,0,0,16"
+                        Visibility="{Binding IsAdministrator, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                    <TextBlock Text="⚠️ Administrator privileges required. Click 'Create Symbolic Link' to restart with elevated permissions."
+                              Foreground="Black" 
+                              FontWeight="SemiBold"/>
+                </Border>
+
+                <!-- Source Path -->
+                <Grid Grid.Row="1" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" 
+                              Text="Source Folder:" 
+                              VerticalAlignment="Center" 
+                              Foreground="{DynamicResource TextBrush}"
+                              FontWeight="SemiBold"
+                              Width="120"/>
+                    
+                    <TextBox Grid.Column="1" 
+                            x:Name="SourcePathTextBox"
+                            Text="{Binding SourcePath, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ModernTextBox}"
+                            Margin="8,0"
+                            AllowDrop="True"
+                            PreviewDragOver="TextBox_PreviewDragOver"
+                            Drop="SourceTextBox_Drop"
+                            ToolTip="Drag and drop a folder here or use the browse button"/>
+                    
+                    <Button Grid.Column="2" 
+                           Command="{Binding BrowseSourceCommand}"
+                           Style="{StaticResource IconButton}"
+                           ToolTip="Browse for source folder">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📁" FontSize="14" Margin="0,0,4,0"/>
+                            <TextBlock Text="Browse" FontSize="12" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- Destination Path -->
+                <Grid Grid.Row="2" Margin="0,0,0,24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" 
+                              Text="Destination:" 
+                              VerticalAlignment="Center" 
+                              Foreground="{DynamicResource TextBrush}"
+                              FontWeight="SemiBold"
+                              Width="120"/>
+                    
+                    <TextBox Grid.Column="1" 
+                            x:Name="DestinationPathTextBox"
+                            Text="{Binding DestinationPath, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ModernTextBox}"
+                            Margin="8,0"
+                            AllowDrop="True"
+                            PreviewDragOver="TextBox_PreviewDragOver"
+                            Drop="DestinationTextBox_Drop"
+                            ToolTip="Drag and drop a folder here or use the browse button"/>
+                    
+                    <Button Grid.Column="2" 
+                           Command="{Binding BrowseDestinationCommand}"
+                           Style="{StaticResource IconButton}"
+                           ToolTip="Browse for destination location">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="�" FontSize="14" Margin="0,0,4,0"/>
+                            <TextBlock Text="Browse" FontSize="12" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="🔗 Create Symbolic Link" 
+                           Command="{Binding CreateSymbolicLinkCommand}"
+                           Style="{StaticResource PrimaryButton}"
+                           Margin="0,0,16,0"/>
+                    
+                    <Button Content="📊 View Operations" 
+                           Click="ViewOperations_Click"
+                           Style="{StaticResource PrimaryButton}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Operations History -->
+        <Border Grid.Row="2" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" 
+                          Text="Recent Operations" 
+                          FontSize="18" 
+                          FontWeight="SemiBold" 
+                          Foreground="{DynamicResource TextBrush}"
+                          Margin="0,0,0,16"/>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Operations}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource SurfaceBrush}" 
+                                       CornerRadius="4" 
+                                       Padding="12" 
+                                       Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Ellipse Grid.Column="0" 
+                                                Style="{StaticResource StatusIndicator}"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,12,0"/>
+
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Foreground="{DynamicResource TextBrush}">
+                                                <Run Text="{Binding SourcePath, Mode=OneWay}" FontWeight="SemiBold"/>
+                                                <Run Text=" → " Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                <Run Text="{Binding DestinationPath, Mode=OneWay}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding CreatedAt, StringFormat='Created: {0:yyyy-MM-dd HH:mm:ss}'}" 
+                                                      FontSize="12" 
+                                                      Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="{Binding ErrorMessage}" 
+                                                      FontSize="12" 
+                                                      Foreground="{DynamicResource ErrorBrush}"
+                                                      Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="2" 
+                                               Content="↶ Rollback" 
+                                               Command="{Binding DataContext.RollbackCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                               CommandParameter="{Binding}"
+                                               Style="{StaticResource PrimaryButton}"
+                                               Background="{DynamicResource ErrorBrush}"
+                                               FontSize="12"
+                                               Padding="12,6"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" 
+               Background="{DynamicResource SurfaceBrush}" 
+               CornerRadius="4" 
+               Padding="16,8" 
+               Margin="0,24,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ProgressBar Grid.Column="0" 
+                            Width="20" Height="20" 
+                            IsIndeterminate="{Binding IsOperationInProgress}"
+                            Visibility="{Binding IsOperationInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Margin="0,0,8,0"/>
+
+                <TextBlock Grid.Column="1" 
+                          Text="{Binding StatusMessage}" 
+                          Foreground="{DynamicResource TextBrush}"
+                          VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="2" 
+                          Text="{Binding CurrentTheme, StringFormat='Theme: {0}'}" 
+                          Foreground="{DynamicResource TextSecondaryBrush}"
+                          FontSize="12"
+                          VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

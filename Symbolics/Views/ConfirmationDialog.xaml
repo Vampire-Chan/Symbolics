@@ -1,0 +1,168 @@
+<Window x:Class="Symbolics.Views.ConfirmationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Symbolic Link Confirmation" 
+        Height="500" Width="650"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        MinHeight="450"
+        MinWidth="600"
+        Background="{DynamicResource BackgroundBrush}">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Themes/DarkTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <TextBlock Grid.Row="0" 
+                   Text="Are you REALLY sure about this?"
+                   FontSize="20" 
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource TextBrush}"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"/>
+
+        <!-- Operation Details -->
+        <Border Grid.Row="1" 
+                Style="{StaticResource Card}" 
+                Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="Operation Details:" 
+                          FontWeight="SemiBold" 
+                          Foreground="{DynamicResource TextBrush}"
+                          Margin="0,0,0,10"/>
+                
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="From:" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Top"/>
+                    <TextBlock Grid.Column="1" x:Name="SourcePathText" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap"/>
+                </Grid>
+                
+                <Grid Margin="0,8,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="To:" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Top"/>
+                    <TextBlock Grid.Column="1" x:Name="DestinationPathText" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap"/>
+                </Grid>
+                
+                <Grid Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Size:" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Top"/>
+                    <TextBlock Grid.Column="1" x:Name="FolderSizeText" Foreground="{DynamicResource TextBrush}"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Warning Message -->
+        <TextBlock Grid.Row="2" 
+                   x:Name="DisclaimerText"
+                   FontSize="14"
+                   Foreground="{DynamicResource WarningBrush}"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,15"/>
+
+        <!-- Funny Disclaimers List -->
+        <Border Grid.Row="3" 
+                Style="{StaticResource Card}" 
+                Margin="0,0,0,15">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Legal Disclaimers (that nobody reads anyway):" 
+                              FontWeight="SemiBold" 
+                              Foreground="{DynamicResource TextBrush}"
+                              Margin="0,0,0,10"/>
+                    
+                    <TextBlock Text="• If your files disappear, blame quantum mechanics"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,4,0,2"/>
+                    <TextBlock Text="• Side effects may include: temporary confusion and mild panic"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2"/>
+                    <TextBlock Text="• Not responsible for alien abductions during file transfer"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2"/>
+                    <TextBlock Text="• May cause sudden urge to backup everything twice"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2"/>
+                    <TextBlock Text="• Warning: May result in brief moments of actual productivity"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2"/>
+                    <TextBlock Text="• If you hear Windows crying, that's normal... probably"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2"/>
+                    <TextBlock Text="• Not tested on Mars (yet)"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2"/>
+                    <TextBlock Text="• May void your warranty with reality itself"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2"/>
+                    <TextBlock Text="• 99.9% of the time, it works every time"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2"/>
+                    <TextBlock Text="• Your computer may develop trust issues"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Margin="0,2,0,4"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Progress Info -->
+        <StackPanel Grid.Row="4" 
+                    x:Name="ProgressPanel" 
+                    Visibility="Collapsed"
+                    Margin="0,0,0,15">
+            <TextBlock Text="Operation in Progress..."
+                      FontWeight="SemiBold"
+                      Foreground="{DynamicResource AccentBrush}"
+                      HorizontalAlignment="Center"/>
+            <ProgressBar x:Name="OperationProgress" 
+                        Height="8" 
+                        Margin="0,8"
+                        Background="{DynamicResource SurfaceBrush}"
+                        Foreground="{DynamicResource AccentBrush}"/>
+            <TextBlock x:Name="ProgressStatusText"
+                      Text="Preparing for takeoff..."
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="5" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center">
+            <Button x:Name="ProceedButton"
+                    Content="Do It Anyway!" 
+                    Style="{StaticResource PrimaryButton}"
+                    Margin="0,0,15,0"
+                    Click="ProceedButton_Click"/>
+            
+            <Button x:Name="CancelButton"
+                    Content="Nope, I'm Out!" 
+                    Style="{StaticResource IconButton}"
+                    Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
