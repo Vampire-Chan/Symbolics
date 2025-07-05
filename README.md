@@ -25,7 +25,7 @@ A simple Windows application that helps you **move folders** (like Google AppDat
 
 ## 📥 Download
 
-> 💾 [**Download Latest Release (FolderLinkerGUI.zip)**](https://github.com/yourusername/folder-linker-gui/releases/latest)
+> # 💾 Download through Releases
 
 - Unzip the file
 - Run `FolderLinkerGUI.exe` as Administrator
@@ -70,7 +70,7 @@ A simple Windows application that helps you **move folders** (like Google AppDat
 
 ## 📜 License
 
-MIT License © 2025 [Your Name or Org]
+MIT License © 2025 
 
 ---
 
@@ -80,12 +80,3 @@ Pull requests, issues, and feature requests are welcome!
 Star ⭐ the repo to support development.
 
 ---
-
-## 📡 Contact & Media
-
-📬 Discord: `yourname#1234`  
-🌐 Website: [yourdomain.com](https://yourdomain.com)  
-📺 YouTube Demo: Coming soon!
-
----
-
